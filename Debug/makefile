@@ -1,102 +1,100 @@
-################################################################################
-# Automatically-generated file. Do not edit!
-# Toolchain: GNU Tools for STM32 (13.3.rel1)
-################################################################################
+#/**
+# * @file    project firmware
+# * @brief   Audio  firmware for STM32F407
+# *
+# * @copyright
+# * Copyright (c) 2026 Jesus Daniel Britoloaiza
+# * All rights reserved.
+#*/
+# ================= TOOLCHAIN =================
+CC = arm-none-eabi-gcc
+OBJCOPY = arm-none-eabi-objcopy
+SIZE = arm-none-eabi-size
 
--include ../makefile.init
+# ================= PROJECT =================
+TARGET = STM32AudioPlayer
+MCU = cortex-m0plus
 
-RM := rm -rf
+LINKER_SCRIPT = ../STM32F407VGTX_FLASH.ld
 
-# All of the sources participating in the build are defined here
--include sources.mk
--include USB_HOST/Target/subdir.mk
--include USB_HOST/App/subdir.mk
--include Middlewares/Third_Party/FatFs/src/option/subdir.mk
--include Middlewares/Third_Party/FatFs/src/subdir.mk
--include Middlewares/ST/STM32_USB_Host_Library/Core/Src/subdir.mk
--include Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src/subdir.mk
--include FATFS/Target/subdir.mk
--include FATFS/App/subdir.mk
--include Drivers/STM32F4xx_HAL_Driver/Src/subdir.mk
--include Core/Startup/subdir.mk
--include Core/Src/subdir.mk
--include objects.mk
+# ================= FLAGS =================
+CFLAGS = -mcpu=$(MCU) -mthumb -std=gnu11 \
+         -O0 -g3 \
+         -ffunction-sections -fdata-sections \
+         -Wall -Wextra -fno-common \
+         -DUSE_HAL_DRIVER -DSTM32F407xx \
+         -mfloat-abi=soft
 
-ifneq ($(MAKECMDGOALS),clean)
-ifneq ($(strip $(S_DEPS)),)
--include $(S_DEPS)
-endif
-ifneq ($(strip $(S_UPPER_DEPS)),)
--include $(S_UPPER_DEPS)
-endif
-ifneq ($(strip $(C_DEPS)),)
--include $(C_DEPS)
-endif
-endif
+LDFLAGS = -mcpu=$(MCU) -mthumb \
+          -T$(LINKER_SCRIPT) \
+          -Wl,--gc-sections \
+          -Wl,-Map=$(TARGET).map \
+          --specs=nano.specs \
+          --specs=nosys.specs \
+          -mfloat-abi=soft
 
--include ../makefile.defs
+# ================= INCLUDE PATHS =================
+INCLUDES = \
+-I../Core/Inc \
+-I../Drivers/CMSIS/Include \
+-I../Drivers/CMSIS/Device/ST/STM32F4xx/Include \
+-I../Drivers/STM32F4xx_HAL_Driver/Inc \
+-I../Middlewares \
+-I../Middlewares/Third_Party/FatFs/src \
+-I../Middlewares/ST/STM32_USB_Host_Library/Core/Inc \
+-I../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc \
+-I../FATFS/App \
+-I../FATFS/Target \
+-I../USB_HOST/App \
+-I../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Inc \
+-I../USB_HOST/Target
 
-OPTIONAL_TOOL_DEPS := \
-$(wildcard ../makefile.defs) \
-$(wildcard ../makefile.init) \
-$(wildcard ../makefile.targets) \
+# ================= SOURCES =================
+C_SRCS := $(shell find ../Core/Src -type f -name "*.c")
+C_SRCS += $(shell find ../Drivers/STM32F4xx_HAL_Driver/Src -type f -name "*.c")
+C_SRCS += $(shell find ../FATFS/App -type f -name "*.c")
+C_SRCS += $(shell find ../FATFS/Target -type f -name "*.c")
+C_SRCS += $(shell find ../USB_HOST/App -type f -name "*.c")
+C_SRCS += $(shell find ../USB_HOST/Target -type f -name "*.c")
+C_SRCS += $(shell find ../Middlewares/Third_Party/FatFs/src -type f -name "*.c")
+C_SRCS += $(shell find ../Middlewares/ST/STM32_USB_Host_Library/Core/Src -type f -name "*.c")
+C_SRCS += $(shell find ../Middlewares/ST/STM32_USB_Host_Library/Class/MSC/Src -type f -name "*.c")
 
+S_SRCS := $(shell find ../Core/Startup -type f \( -name "*.s" -o -name "*.S" \))
 
-BUILD_ARTIFACT_NAME := audioexample
-BUILD_ARTIFACT_EXTENSION := elf
-BUILD_ARTIFACT_PREFIX :=
-BUILD_ARTIFACT := $(BUILD_ARTIFACT_PREFIX)$(BUILD_ARTIFACT_NAME)$(if $(BUILD_ARTIFACT_EXTENSION),.$(BUILD_ARTIFACT_EXTENSION),)
+# remove duplicates sources
+OBJS := $(sort $(C_SRCS:.c=.o) $(S_SRCS:.s=.o))
 
-# Add inputs and outputs from these tool invocations to the build variables 
-EXECUTABLES += \
-audioexample.elf \
+# ================= BUILD =================
+all: $(TARGET).elf
 
-MAP_FILES += \
-audioexample.map \
+$(TARGET).elf: $(OBJS)
+	@echo "Linking firmware..."
+	$(CC) $(OBJS) $(LDFLAGS) -o $@
+	$(SIZE) $@
 
-SIZE_OUTPUT += \
-default.size.stdout \
+# ================= COMPILE =================
+%.o: %.c
+	@echo "CC $<"
+	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
 
-OBJDUMP_LIST += \
-audioexample.list \
+%.o: %.s
+	@echo "ASM $<"
+	$(CC) -x assembler-with-cpp $(CFLAGS) -c $< -o $@
 
+# ================= OUTPUT =================
+bin: $(TARGET).elf
+	$(OBJCOPY) -O binary $< $(TARGET).bin
 
-# All Target
-all: main-build
+hex: $(TARGET).elf
+	$(OBJCOPY) -O ihex $< $(TARGET).hex
 
-# Main-build Target
-main-build: audioexample.elf secondary-outputs
-
-# Tool invocations
-audioexample.elf audioexample.map: $(OBJS) $(USER_OBJS) C:\Users\Jesus\ Daniel\ B\OneDrive\Escritorio\audioexample\STM32F407VGTX_FLASH.ld makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-gcc -o "audioexample.elf" @"objects.list" $(USER_OBJS) $(LIBS) -mcpu=cortex-m4 -T"C:\Users\Jesus Daniel B\OneDrive\Escritorio\audioexample\STM32F407VGTX_FLASH.ld" --specs=nosys.specs -Wl,-Map="audioexample.map" -Wl,--gc-sections -static --specs=nano.specs -mfpu=fpv4-sp-d16 -mfloat-abi=hard -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-	@echo 'Finished building target: $@'
-	@echo ' '
-
-default.size.stdout: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-size  $(EXECUTABLES)
-	@echo 'Finished building: $@'
-	@echo ' '
-
-audioexample.list: $(EXECUTABLES) makefile objects.list $(OPTIONAL_TOOL_DEPS)
-	arm-none-eabi-objdump -h -S $(EXECUTABLES) > "audioexample.list"
-	@echo 'Finished building: $@'
-	@echo ' '
-
-# Other Targets
+# ================= CLEAN =================
 clean:
-	-$(RM) audioexample.elf audioexample.list audioexample.map default.size.stdout
-	-@echo ' '
+	rm -rf $(OBJS) \
+	       $(TARGET).elf \
+	       $(TARGET).bin \
+	       $(TARGET).hex \
+	       $(TARGET).map
 
-secondary-outputs: $(SIZE_OUTPUT) $(OBJDUMP_LIST)
-
-fail-specified-linker-script-missing:
-	@echo 'Error: Cannot find the specified linker script. Check the linker settings in the build configuration.'
-	@exit 2
-
-warn-no-linker-script-specified:
-	@echo 'Warning: No linker script specified. Check the linker settings in the build configuration.'
-
-.PHONY: all clean dependents main-build fail-specified-linker-script-missing warn-no-linker-script-specified
-
--include ../makefile.targets
+.PHONY: all clean bin hex
