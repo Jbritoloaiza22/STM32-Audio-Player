@@ -1,0 +1,42 @@
+name: build
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build Docker image
+        run: docker build -t stm32-build ./docker
+
+
+      - name: Compile firmware inside container
+        run: |
+          docker run --rm \
+            -v ${{ github.workspace }}:/workspace \
+            stm32-build \
+            bash -c '
+              cd /workspace/Debug
+              make clean
+              make all
+            '
+
+      - name: Verify build outputs
+        run: |
+          ls -R STM32CubeIDE/Debug || true
+
+      - name: Upload firmware artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: stm32-firmware
+          path: |
+            STM32CubeIDE/Debug/*.elf
+            STM32CubeIDE/Debug/*.bin
+            STM32CubeIDE/Debug/*.hex
+            STM32CubeIDE/Debug/*.map
