@@ -22,9 +22,7 @@ jobs:
             -v ${{ github.workspace }}:/workspace \
             stm32-build \
             bash -c '
-              pwd
-              ls
-              cd /workspace/STM32CubeIDE/Debug
+              cd /workspace/Debug
               make clean
               make all
             '
