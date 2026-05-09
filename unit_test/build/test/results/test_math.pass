@@ -1,0 +1,23 @@
+---
+:source:
+  :file: test/test_math.c
+  :dirname: test
+  :basename: test_math.c
+:successes:
+- :test: test_add_positive_numbers
+  :line: 12
+  :message: ''
+  :unity_test_time: 0
+- :test: test_add_negative_numbers
+  :line: 17
+  :message: ''
+  :unity_test_time: 0
+:failures: []
+:ignores: []
+:counts:
+  :total: 2
+  :passed: 2
+  :failed: 0
+  :ignored: 0
+:stdout: []
+:time: 0.19784371100831777
