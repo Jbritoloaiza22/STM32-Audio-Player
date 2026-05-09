@@ -6,7 +6,7 @@ The main goal is to progressively replace auto-generated drivers with **custom l
 
 ## Roadmap
 - Base project with CubeMX drivers ✅
-- Audio codec integration (CS43L22) ✅
+- Audio codec integration (CS43L22) 
 - Custom I2S driver (in progress)
 - Custom DMA driver (planned)
 - Full audio stack from scratch (planned)
