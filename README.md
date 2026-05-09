@@ -20,7 +20,7 @@ The project also focuses on:
 
 - Base project with CubeMX drivers ✅
 - Audio codec integration (CS43L22)
-- Custom I2S driver (in progress)
+- Custom I2S driver (planned)
 - Custom DMA driver (planned)
 - Full audio stack from scratch (planned)
 - GitHub Actions CI/CD ✅
