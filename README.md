@@ -1,8 +1,8 @@
-# STM32F407 Audio Player Project
+# STM32F407G-DISC1 Audio Player Project
 
 ## Overview
-This project started with STM32CubeMX-generated drivers for STM32F407 and basic audio playback using the CS43L22 codec.  
-The purpose is to progressively replace auto-generated drivers with **custom low-level implementations written from scratch**, gaining full control over I2S, DMA, and audio streaming.
+This project started with STM32CubeMX-generated drivers for the STM32F407G-DISC1 board and basic audio playback using the CS43L22 codec.  
+The main goal is to progressively replace auto-generated drivers with **custom low-level implementations written from scratch**, while building a professional embedded development workflow.
 
 ## Roadmap
 - Base project with CubeMX drivers ✅
@@ -19,8 +19,8 @@ The purpose is to progressively replace auto-generated drivers with **custom low
 - MISRA C compliance (planned)
 
 ## Hardware
-- STM32F407 custom board
-- CS43L22 audio codec
+- STM32F407G-DISC1 development board
+- CS43L22 audio codec (on-board)
 - External storage for WAV files
 
 ## License
